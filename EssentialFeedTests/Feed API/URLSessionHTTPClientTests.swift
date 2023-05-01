@@ -10,10 +10,13 @@ class URLSessionHTTPClient {
         self.session = session
     }
 
+    struct UnexpectedValuesRepresentation: Error {}
     func get(from url: URL, completion: @escaping (HTTPCLientResult) -> Void) {
         session.dataTask(with: url) {_, _, error in
             if let error = error {
                 completion(.failure(error))
+            } else {
+                completion(.failure(UnexpectedValuesRepresentation()))
             }
         }.resume()
     }
@@ -31,7 +34,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
         URLProtocolStub.stopInterceptingRequests()
     }
     func test_getFromURL_performsGETRequestWithURL() {
-        let url = URL(string: "http://any-url.com")!
+        let url = anyURL()
         let exp = expectation(description: "Wait for te block")
 
         URLProtocolStub.observeRequests { request in
@@ -46,12 +49,11 @@ final class URLSessionHTTPClientTests: XCTestCase {
     }
 
     func test_getFromURL_failsOnRequestError () {
-        let url = URL(string: "http://any-url.com")!
         let error = NSError (domain: "any error", code: 1)
-        URLProtocolStub.stub(url: url, data: nil, response: nil, error: error)
+        URLProtocolStub.stub(url: anyURL(), data: nil, response: nil, error: error)
 
         let exp = expectation(description: "Wait for te block")
-        makeSUT().get(from: url)  { result in
+        makeSUT().get(from: anyURL())  { result in
             switch result {
             case let .failure(receivedError as NSError):
                 XCTAssertEqual(receivedError.domain, error.domain)
@@ -65,7 +67,27 @@ final class URLSessionHTTPClientTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
 
+    func test_getFromURL_failsOnAl1NilValues() {
+        URLProtocolStub.stub(url: anyURL(), data: nil, response: nil, error: nil)
+
+        let exp = expectation(description: "Wait for te block")
+        makeSUT().get(from: anyURL())  { result in
+            switch result {
+            case .failure: break
+            default:
+                XCTFail("No error expected, got: \(result)")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 1.0)
+    }
+
     // MARK: - Helpers
+
+    private func anyURL(_ string: String = "http://any-url.com") -> URL {
+        URL(string: string)!
+    }
 
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> URLSessionHTTPClient {
         let sut = URLSessionHTTPClient()
