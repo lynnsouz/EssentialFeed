@@ -17,18 +17,20 @@ final class EssentialFeedEndToEndTests: XCTestCase {
         case let .success(items)?:
             XCTAssertEqual(items.count, 8, "Expected 8 items in the test account feed")
         case let .failure(error)?:
-            XCTFail("Exoected successful feed result, got \(error) instead")
+            XCTFail("Expected successful feed result, got \(error) instead")
         default:
-            XCTFail("Exoected successful feed result, got no result instead")
+            XCTFail("Expected successful feed result, got no result instead")
         }
     }
 
     // MARK: - Helpers
 
-    private func getFeedResult() -> LoadFeedResult? {
+    private func getFeedResult(file: StaticString = #file, line: UInt = #line) -> LoadFeedResult? {
         let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
         let client = URLSessionHTTPClient()
         let loader = RemoteFeedLoader(client: client, url: testServerURL)
+        trackForMemoryLeaks(client, file: file, line: line)
+        trackForMemoryLeaks(loader, file: file, line: line)
 
         weak var exp = expectation (description: "Wait for load completion")
 
