@@ -17,16 +17,19 @@ final class URLSessionHTTPClientTests: XCTestCase {
 
     func test_getFromURL_performsGETRequestWithURL() {
         let url = anyURL()
-        let exp = expectation(description: "Line: \(#line) - Wait for te block. \(#file), ")
+        weak var exp = expectation(description: "Line: \(#line) - Wait for te block. \(#file), ")
 
         URLProtocolStub.observeRequests { request in
             XCTAssertEqual(request.url, url)
             XCTAssertEqual(request .httpMethod, "GET")
-            exp.fulfill()
+            guard let promise = exp else { return }
+            promise.fulfill()
+            exp = nil
         }
 
         makeSUT().get(from: url) { _ in }
 
+        guard let exp = exp else { return XCTFail("No expectatuion found") }
         wait(for: [exp], timeout: 1.0)
     }
 
