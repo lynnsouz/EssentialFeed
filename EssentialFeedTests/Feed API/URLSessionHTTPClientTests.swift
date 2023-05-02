@@ -132,14 +132,23 @@ final class URLSessionHTTPClientTests: XCTestCase {
                            line: UInt = #line) -> HTTPCLientResult {
         URLProtocolStub.stub(data: data, response: response, error: error)
         let sut = makeSUT(file: file, line: line)
-        let exp = expectation(description: "Wait for te block at \(file), \(line)")
+        weak var exp = expectation(description: "Line: \(#line) - Wait for te block. \(#file), ")
 
         var receivedResult: HTTPCLientResult!
         sut.get(from: anyURL())  { result in
             receivedResult = result
-            exp.fulfill()
+            guard let expectation = exp else {
+                XCTFail("No expectatuion found", file: file, line: line)
+                return
+            }
+            expectation.fulfill()
+            exp = nil
         }
 
+        guard let exp = exp else {
+            XCTFail("No expectatuion found", file: file, line: line)
+            return receivedResult
+        }
         wait(for: [exp], timeout: 1.0)
         return receivedResult
     }
