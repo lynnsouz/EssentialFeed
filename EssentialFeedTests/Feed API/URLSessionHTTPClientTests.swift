@@ -3,7 +3,7 @@ import EssentialFeed
 
 
 
-class URLSessionHTTPClient {
+class URLSessionHTTPClient: HTTPClient {
     private let session: URLSession
 
     init(session: URLSession = .shared) {
@@ -36,12 +36,13 @@ final class URLSessionHTTPClientTests: XCTestCase {
         super.tearDown()
         URLProtocolStub.stopInterceptingRequests()
     }
+
     func test_getFromURL_performsGETRequestWithURL() {
         let url = anyURL()
-        let exp = expectation(description: "Wait for te block performsGETRequestWithURL")
+        let exp = expectation(description: "Line: \(#line) - Wait for te block. \(#file), ")
 
         URLProtocolStub.observeRequests { request in
-            XCTAssertEqual (request.url, url)
+            XCTAssertEqual(request.url, url)
             XCTAssertEqual(request .httpMethod, "GET")
             exp.fulfill()
         }
@@ -51,7 +52,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
 
-    func test_getFromURL_failsOnRequestError () {
+    func test_getFromURL_failsOnRequestError() {
         let requestError = anyError()
         let receivedError = resultErrorFor(data: nil, response: nil, error: requestError)
 
@@ -74,7 +75,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
         let data = anyData()
         let response = anyHTTPURLResponse()
 
-        let result = resultFor(data: data, response: response, error: nil)
+        let result = resultFor(data: data, response: response, error: nil, file: #file, line: #line)
 
         switch result {
         case let .success(receivedData, receivedResponse):
@@ -111,11 +112,11 @@ final class URLSessionHTTPClientTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func resultErrorFor (data: Data?,
-                                 response: URLResponse?,
-                                 error: Error?,
-                                 file: StaticString = #file,
-                                 line: UInt = #line) -> Error? {
+    private func resultErrorFor(data: Data?,
+                                response: URLResponse?,
+                                error: Error?,
+                                file: StaticString = #file,
+                                line: UInt = #line) -> Error? {
         let result = resultFor(data: data, response: response, error: error, file: file, line: line)
 
         switch result {
@@ -150,7 +151,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
                            line: UInt = #line) -> HTTPCLientResult {
         URLProtocolStub.stub(data: data, response: response, error: error)
         let sut = makeSUT(file: file, line: line)
-        let exp = expectation(description: "Wait for te block")
+        let exp = expectation(description: "Wait for te block at \(file), \(line)")
 
         var receivedResult: HTTPCLientResult!
         sut.get(from: anyURL())  { result in
@@ -187,7 +188,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
 
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> URLSessionHTTPClient {
         let sut = URLSessionHTTPClient()
-        trackForMemoryLeaks (sut, file: file, line: line)
+        trackForMemoryLeaks(sut, file: file, line: line)
         return sut
     }
 
@@ -204,7 +205,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
         static func stub(data: Data? , response: URLResponse?, error: Error?) {
             stub = Stub(data: data, response: response, error: error)
         }
-        static func observeRequests (observer: @escaping (URLRequest) -> Void) {
+        static func observeRequests(observer: @escaping (URLRequest) -> Void) {
             requestObserver = observer
         }
 
@@ -237,7 +238,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
             }
 
             if let response = URLProtocolStub.stub?.response {
-                client?.urlProtocol (self, didReceive: response, cacheStoragePolicy: .notAllowed)
+                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             }
 
             client?.urlProtocolDidFinishLoading(self)
