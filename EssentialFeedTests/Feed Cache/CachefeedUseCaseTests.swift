@@ -74,7 +74,7 @@ final class CachefeedUseCaseTests: XCTestCase {
         let store = FeedStoreSpy()
         var sut: LocalFeedLoader? = LocalFeedLoader(store: store, currentDate: Date.init)
 
-        var receivedResults = [Error?]()
+        var receivedResults = [LocalFeedLoader.SaveResult]()
         sut?.save([uniqueltem()]) { receivedResults.append ($0) }
 
         sut = nil
@@ -87,14 +87,14 @@ final class CachefeedUseCaseTests: XCTestCase {
         let store = FeedStoreSpy()
         var sut: LocalFeedLoader? = LocalFeedLoader(store: store, currentDate: Date.init)
 
-        var receivedResults = [Error?]()
+        var receivedResults = [LocalFeedLoader.SaveResult]()
         sut?.save([uniqueltem()]) { receivedResults.append ($0) }
 
         store.completeDeletionSuccessfully()
         sut = nil
         store.completeInsertion(with: anyNSError())
 
-        //XCTAssertTrue(receivedResults.isEmpty)
+        XCTAssertTrue(receivedResults.isEmpty)
     }
 
     // MARK: - Helpers

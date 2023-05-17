@@ -4,6 +4,8 @@ public final class LocalFeedLoader {
     private let store: FeedStore
     private let currentDate: () -> Date
 
+    public typealias SaveResult = Error?
+
     public init(store: FeedStore,
           currentDate: @escaping () -> Date) {
         self.store = store
