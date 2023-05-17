@@ -12,10 +12,10 @@ public final class LocalFeedLoader {
         self.currentDate = currentDate
     }
 
-    public func save(_ items: [FeedImage], completion: @escaping (Error?) -> Void) {
+    public func save(_ feed: [FeedImage], completion: @escaping (Error?) -> Void) {
         store.deleteCachedFeed { [weak self] error in
             self?.handleSaveAfterDeleteCache(error: error,
-                                             items: items,
+                                             items: feed,
                                              completion: completion)
         }
     }
