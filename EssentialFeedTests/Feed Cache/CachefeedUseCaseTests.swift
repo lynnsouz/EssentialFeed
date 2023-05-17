@@ -11,8 +11,9 @@ class LocalFeedLoader {
         self.currentDate = currentDate
     }
 
-    func save(_ items: [FeedItem]) {
+    func save(_ items: [FeedItem], completion: @escaping (Error?) -> Void) {
         store.deleteCachedFeed { [unowned self] error in
+            completion (error)
             if error == nil {
                 self.store.insert(items, timestamp: self.currentDate())
             }
@@ -61,7 +62,7 @@ final class CachefeedUseCaseTests: XCTestCase {
     func test_save_requestsCacheDeletion() {
         let (sut, store) = makeSUT()
         let items = [uniqueltem(), uniqueltem()]
-        sut.save(items)
+        sut.save(items) { _ in }
 
         XCTAssertEqual(store.receivedMessages, [.deleteCachedFeed])
     }
@@ -71,7 +72,7 @@ final class CachefeedUseCaseTests: XCTestCase {
         let items = [uniqueltem(), uniqueltem()]
         let deletionError = anyNSError()
 
-        sut.save(items)
+        sut.save(items) { _ in }
         store.completeDeletion(with: deletionError)
 
         XCTAssertEqual(store.receivedMessages, [.deleteCachedFeed])
@@ -82,10 +83,30 @@ final class CachefeedUseCaseTests: XCTestCase {
         let (sut, store) = makeSUT(currentDate: { timestamp })
         let items = [uniqueltem(), uniqueltem()]
 
-        sut.save(items)
+        sut.save(items) { _ in }
         store.completeDeletionSuccessfully()
 
         XCTAssertEqual(store.receivedMessages, [.deleteCachedFeed, .insert(items, timestamp)])
+    }
+
+    func test_save_failsOnDeletionError() {
+        let timestamp = Date()
+        let (sut, store) = makeSUT(currentDate: { timestamp })
+        let items = [uniqueltem(), uniqueltem()]
+        let deletionError = anyNSError()
+
+        let expect = expectation(description: "wait for the clousure")
+
+        var receivedError: Error?
+        sut.save(items) { error in
+            receivedError = error
+            expect.fulfill()
+        }
+
+        store.completeDeletion(with: deletionError)
+        wait(for: [expect])
+
+        XCTAssertEqual(receivedError as NSError?, deletionError)
     }
 
     // MARK: - Helpers
