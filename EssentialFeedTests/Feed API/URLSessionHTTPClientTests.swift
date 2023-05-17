@@ -153,10 +153,6 @@ final class URLSessionHTTPClientTests: XCTestCase {
         return receivedResult
     }
 
-    private func anyURL(_ string: String = "http://any-url.com") -> URL {
-        URL(string: string)!
-    }
-
     private func nonHTTPURLResponse() -> URLResponse {
         URLResponse(url: anyURL(),
                     mimeType: nil,

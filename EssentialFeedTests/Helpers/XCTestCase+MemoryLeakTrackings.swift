@@ -9,4 +9,8 @@ extension XCTestCase {
             XCTAssertNil(instance, "Should dealocate. Potentoal memory leak.", file: file, line: line)
         }
     }
+
+    func anyURL(_ string: String = "http://any-url.com") -> URL {
+        URL(string: string)!
+    }
 }
