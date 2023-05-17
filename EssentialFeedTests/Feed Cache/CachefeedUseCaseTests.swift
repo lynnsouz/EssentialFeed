@@ -128,19 +128,19 @@ final class CachefeedUseCaseTests: XCTestCase {
 
     private func uniqueltem(id: UUID = UUID(),
                             description: String? = "Any desc.",
-                            location: String? = "Any loc.") -> FeedItem {
-        FeedItem(id: UUID(),
+                            location: String? = "Any loc.") -> FeedImage {
+        FeedImage(id: UUID(),
                  description: description,
                  location: location,
-                 imageURL: anyURL())
+                 url: anyURL())
     }
 
-    private func uniqueItems() -> (models: [FeedItem], local: [LocalFeedItem]) {
+    private func uniqueItems() -> (models: [FeedImage], local: [LocalFeedImage]) {
         let items = [uniqueltem(), uniqueltem()]
-        let localItems = items.map { LocalFeedItem(id: $0.id,
+        let localItems = items.map { LocalFeedImage(id: $0.id,
                                                    description: $0.description,
                                                    location: $0.location,
-                                                   imageURL: $0.imageURL) }
+                                                   url: $0.url) }
         return (items, localItems)
     }
 
@@ -152,7 +152,7 @@ final class CachefeedUseCaseTests: XCTestCase {
 
         enum ReceivedMessage: Equatable {
             case deleteCachedFeed
-            case insert([LocalFeedItem], Date)
+            case insert([LocalFeedImage], Date)
         }
 
         private(set) var receivedMessages = [ReceivedMessage]()
@@ -173,7 +173,8 @@ final class CachefeedUseCaseTests: XCTestCase {
             deletionCompletions[index](nil)
         }
 
-        func insert(_ items: [EssentialFeed.LocalFeedItem], timestamp: Date, completion: @escaping InsertionCompletion) {
+        func insert(_ items: [EssentialFeed.LocalFeedImage],
+                    timestamp: Date, completion: @escaping InsertionCompletion) {
             insertionCompletions.append(completion)
             receivedMessages.append(.insert(items, timestamp))
         }

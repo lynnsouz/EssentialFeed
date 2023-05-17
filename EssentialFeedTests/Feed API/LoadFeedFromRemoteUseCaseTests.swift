@@ -73,12 +73,12 @@ class LoadFeedFromRemoteUseCaseTests: XCTestCase {
     func test_load_deliversItemsOn200HTTPResponseWithItems() {
         let (sut, client) = makeSUT()
 
-        let (item1, item1JSON) = makeFeedItem(item: .stub(id: UUID(),
+        let (item1, item1JSON) = makeFeedImage(item: .stub(id: UUID(),
                                                           description: nil,
                                                           location: nil,
                                                           imageURL: URL(string: "http://a-url.com")!))
 
-        let (item2, item2JSON) = makeFeedItem(item: .stub(id: UUID(),
+        let (item2, item2JSON) = makeFeedImage(item: .stub(id: UUID(),
                                                           description: "a description",
                                                           location: "a Location",
                                                           imageURL: URL(string: "http://other-url.com")!))
@@ -121,13 +121,13 @@ class LoadFeedFromRemoteUseCaseTests: XCTestCase {
         .failure(error)
     }
 
-    private func makeFeedItem(item: FeedItem = .stub()) -> (model: FeedItem,
+    private func makeFeedImage(item: FeedImage = .stub()) -> (model: FeedImage,
                                                             json: [String: Any]) {
         let json: [String: Any] = [
             "id": item.id.uuidString,
             "description": item.description,
             "location": item.location,
-            "image": item.imageURL.absoluteString
+            "image": item.url.absoluteString
         ].compactMapValues { $0 }
 
         return (item, json)
@@ -190,14 +190,14 @@ class LoadFeedFromRemoteUseCaseTests: XCTestCase {
     }
 }
 
-extension FeedItem {
+extension FeedImage {
     static func stub(id: UUID = UUID(),
                      description: String? = nil,
                      location: String? = nil,
-                     imageURL: URL = URL(string: "https://a-url.com")!) -> FeedItem {
-        FeedItem(id: id,
+                     imageURL: URL = URL(string: "https://a-url.com")!) -> FeedImage {
+        FeedImage(id: id,
                  description: description,
                  location: location,
-                 imageURL: imageURL)
+                 url: imageURL)
     }
 }
