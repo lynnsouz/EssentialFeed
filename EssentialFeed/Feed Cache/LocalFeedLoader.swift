@@ -20,6 +20,10 @@ public final class LocalFeedLoader {
         }
     }
 
+    public func load() {
+        store.retrive()
+    }
+
     private func handleSaveAfterDeleteCache(error: Error?, items: [FeedImage], completion: @escaping (Error?) -> Void) {
         if let cacheDeletionError = error {
             completion(cacheDeletionError)
