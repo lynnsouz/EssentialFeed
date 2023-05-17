@@ -142,8 +142,4 @@ final class CachefeedUseCaseTests: XCTestCase {
                                                    url: $0.url) }
         return (items, localItems)
     }
-
-    private func anyNSError() -> NSError {
-        NSError(domain: "any error", code: 0)
-    }
 }
