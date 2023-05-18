@@ -22,19 +22,32 @@ public final class LocalFeedLoader {
     }
 
     public func load(completion: @escaping (LoadResult) -> Void) {
-        store.retrive { result in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error))
-            case .empty:
-                completion(.success([]))
-            case let .found(feed, _):
-                completion(.success(feed.toModels()))
-            }
+        store.retrive { [weak self] result in
+            self?.handleRetrieveResult(result, completion: completion)
         }
     }
 
-    private func handleSaveAfterDeleteCache(error: Error?, items: [FeedImage], completion: @escaping (Error?) -> Void) {
+    private func handleRetrieveResult(_ result: RetrieveCachedFeedResult,
+                                      completion: @escaping (LoadResult) -> Void) {
+        switch result {
+        case let .failure(error):
+            completion(.failure(error))
+        case let .found(feed, timestamp) where self.validate(timestamp):
+            completion(.success(feed.toModels()))
+        case .found, .empty:
+            completion(.success([]))
+        }
+    }
+
+    private func validate(_ timestamp: Date) -> Bool {
+        let calendar = Calendar(identifier: .gregorian)
+        guard let maxCacheAge = calendar.date(byAdding: .day, value: 7, to: timestamp)
+        else { return false }
+        return currentDate() < maxCacheAge
+    }
+
+    private func handleSaveAfterDeleteCache(error: Error?, items: [FeedImage],
+                                            completion: @escaping (Error?) -> Void) {
         if let cacheDeletionError = error {
             completion(cacheDeletionError)
             return
