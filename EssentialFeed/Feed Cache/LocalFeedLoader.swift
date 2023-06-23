@@ -4,62 +4,18 @@ public final class LocalFeedLoader {
     private let store: FeedStore
     private let currentDate: () -> Date
     private let calendar = Calendar(identifier: .gregorian)
-
+    
     public typealias SaveResult = Error?
     public typealias LoadResult = LoadFeedResult
 
-    public init(store: FeedStore,
-          currentDate: @escaping () -> Date) {
-        self.store = store
-        self.currentDate = currentDate
-    }
-
-    public func save(_ feed: [FeedImage], completion: @escaping (SaveResult) -> Void) {
-        store.deleteCachedFeed { [weak self] error in
-            self?.handleSaveAfterDeleteCache(error: error,
-                                             items: feed,
-                                             completion: completion)
-        }
-    }
-
-    public func load(completion: @escaping (LoadResult) -> Void) {
-        store.retrive { [weak self] result in
-            self?.handleRetrieveResult(result, completion: completion)
-        }
-    }
-
-    private func handleRetrieveResult(_ result: RetrieveCachedFeedResult,
-                                      completion: @escaping (LoadResult) -> Void) {
-        switch result {
-        case let .failure(error):
-            completion(.failure(error))
-        case let .found(feed, timestamp) where self.validate(timestamp):
-            completion(.success(feed.toModels()))
-        case .found:
-            completion(.success([]))
-        case .empty:
-            completion(.success([]))
-        }
-    }
-
-    public func validateCache() {
-        store.retrive { [weak self] result in
-            self?.handleValidateCacheRetrieveResult(result)
-        }
-    }
-
-    private func handleValidateCacheRetrieveResult(_ result: RetrieveCachedFeedResult) {
-        switch result {
-        case .failure:
-            store.deleteCachedFeed { _ in }
-        case let .found(_, timestamp) where !self.validate(timestamp):
-            store.deleteCachedFeed { _ in }
-        case .empty, .found: break
-        }
-    }
-
     private var maxCacheAgeInDays: Int {
         return 7
+    }
+
+    public init(store: FeedStore,
+                currentDate: @escaping () -> Date) {
+        self.store = store
+        self.currentDate = currentDate
     }
 
     private func validate(_ timestamp: Date) -> Bool {
@@ -69,6 +25,16 @@ public final class LocalFeedLoader {
                                               to: timestamp)
         else { return false }
         return currentDate() < maxCacheAge
+    }
+}
+
+extension LocalFeedLoader {
+    public func save(_ feed: [FeedImage], completion: @escaping (SaveResult) -> Void) {
+        store.deleteCachedFeed { [weak self] error in
+            self?.handleSaveAfterDeleteCache(error: error,
+                                             items: feed,
+                                             completion: completion)
+        }
     }
 
     private func handleSaveAfterDeleteCache(error: Error?, items: [FeedImage],
@@ -84,6 +50,43 @@ public final class LocalFeedLoader {
         store.insert(items.toLocal(), timestamp: self.currentDate()) { [weak self] error in
             guard self != nil else { return }
             completion(error)
+        }
+    }
+}
+
+extension LocalFeedLoader {
+    public func load(completion: @escaping (LoadResult) -> Void) {
+        store.retrive { [weak self] result in
+            self?.handleRetrieveResult(result, completion: completion)
+        }
+    }
+    private func handleRetrieveResult(_ result: RetrieveCachedFeedResult,
+                                      completion: @escaping (LoadResult) -> Void) {
+        switch result {
+        case let .failure(error):
+            completion(.failure(error))
+        case let .found(feed, timestamp) where self.validate(timestamp):
+            completion(.success(feed.toModels()))
+        case .found, .empty:
+            completion(.success([]))
+        }
+    }
+}
+
+extension LocalFeedLoader {
+    public func validateCache() {
+        store.retrive { [weak self] result in
+            self?.handleValidateCacheRetrieveResult(result)
+        }
+    }
+    
+    private func handleValidateCacheRetrieveResult(_ result: RetrieveCachedFeedResult) {
+        switch result {
+        case .failure:
+            store.deleteCachedFeed { _ in }
+        case let .found(_, timestamp) where !self.validate(timestamp):
+            store.deleteCachedFeed { _ in }
+        case .empty, .found: break
         }
     }
 }
