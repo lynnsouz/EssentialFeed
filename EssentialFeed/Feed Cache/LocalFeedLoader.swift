@@ -47,7 +47,6 @@ public final class LocalFeedLoader {
         store.retrive { [weak self] result in
             self?.handleValidateCacheRetrieveResult(result)
         }
-
     }
 
     private func handleValidateCacheRetrieveResult(_ result: RetrieveCachedFeedResult) {
