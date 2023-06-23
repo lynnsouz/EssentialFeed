@@ -4,13 +4,13 @@ import EssentialFeed
 class LoadFeedFromCacheUseCaseTests: XCTestCase {
 
     func test_init_doesNotMessageStoreUponCreation() {
-        let (_, store) = makeSUT()
+        let (_, store) = makeCachefeedSUT()
 
         XCTAssertEqual(store.receivedMessages, [])
     }
 
     func test_load_requestsCacheRetrieval () {
-        let (sut, store) = makeSUT()
+        let (sut, store) = makeCachefeedSUT()
 
         sut.load() { _ in }
 
@@ -18,7 +18,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
     }
 
     func test_load_failsOnRetrievalError () {
-        let (sut, store) = makeSUT()
+        let (sut, store) = makeCachefeedSUT()
         let retrivalError = anyNSError()
 
         expect(sut, toCompletewith: .failure(retrivalError)) {
@@ -27,7 +27,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
     }
 
     func test_load_deliversNoImagesOnEmptyCache() {
-        let (sut, store) = makeSUT()
+        let (sut, store) = makeCachefeedSUT()
 
         expect(sut, toCompletewith: .success([])) {
             store.completeRetrievalWithEmptyCache()
@@ -38,7 +38,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
         let feed = uniqueImageFeed()
         let fixedCurrentDate = Date()
         let lessThanSevenDaysOldTimestamp = fixedCurrentDate.adding(days: -7).adding(seconds: 1)
-        let (sut, store) = makeSUT(currentDate: { fixedCurrentDate })
+        let (sut, store) = makeCachefeedSUT(currentDate: { fixedCurrentDate })
 
         expect(sut, toCompletewith: .success(feed.models)) {
             store.completeRetrieval(with: feed.local,
@@ -49,7 +49,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
     func test_load_deliversNoImagesOnSevenDaysOldCache() {
         let fixedCurrentDate = Date()
         let sevenDaysOldTimestamp = fixedCurrentDate.adding(days: -7)
-        let (sut, store) = makeSUT(currentDate: { fixedCurrentDate })
+        let (sut, store) = makeCachefeedSUT(currentDate: { fixedCurrentDate })
 
         expect(sut, toCompletewith: .success([])) {
             store.completeRetrieval(with: [],
@@ -60,7 +60,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
     func test_load_deliversNoImagesOnMoreSevenDaysOldCache() {
         let fixedCurrentDate = Date()
         let sevenDaysOldTimestamp = fixedCurrentDate.adding(days: -7).adding(seconds: -1)
-        let (sut, store) = makeSUT(currentDate: { fixedCurrentDate })
+        let (sut, store) = makeCachefeedSUT(currentDate: { fixedCurrentDate })
 
         expect(sut, toCompletewith: .success([])) {
             store.completeRetrieval(with: [],
@@ -69,7 +69,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
     }
 
     func test_load_hasNoSideEffectsOnRetrievalError() {
-        let (sut, store) = makeSUT()
+        let (sut, store) = makeCachefeedSUT()
 
         sut.load { _ in }
         store.completeRetrieval(with: anyNSError())
@@ -78,7 +78,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
     }
 
     func test_load_hasNoSideEffectsOnEmptyCache() {
-        let (sut, store) = makeSUT()
+        let (sut, store) = makeCachefeedSUT()
 
         sut.load { _ in }
         store.completeRetrievalWithEmptyCache()
@@ -90,7 +90,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
         let feed = uniqueImageFeed()
         let fixedCurrentDate = Date()
         let lessThanSevenDaysOldTimestamp = fixedCurrentDate.adding(days: -7).adding(seconds: 1)
-        let (sut, store) = makeSUT(currentDate: { fixedCurrentDate })
+        let (sut, store) = makeCachefeedSUT(currentDate: { fixedCurrentDate })
 
         sut.load { _ in }
         store.completeRetrieval(with: feed.local, timestamp: lessThanSevenDaysOldTimestamp)
@@ -102,7 +102,7 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
         let feed = uniqueImageFeed()
         let fixedCurrentDate = Date()
         let sevenDaysOldTimestamp = fixedCurrentDate.adding(days: -7)
-        let (sut, store) = makeSUT(currentDate: { fixedCurrentDate })
+        let (sut, store) = makeCachefeedSUT(currentDate: { fixedCurrentDate })
 
         sut.load { _ in }
         store.completeRetrieval(with: feed.local, timestamp: sevenDaysOldTimestamp)
@@ -125,16 +125,6 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeSUT(currentDate: @escaping () -> Date = Date.init,
-                         file: StaticString = #file,
-                         line: UInt = #line) -> (sut: LocalFeedLoader, store: FeedStoreSpy) {
-        let store = FeedStoreSpy()
-        let sut = LocalFeedLoader(store: store, currentDate: currentDate)
-        trackForMemoryLeaks(store, file: file, line: line)
-        trackForMemoryLeaks(sut, file: file, line: line)
-        return (sut, store)
-    }
-
     private func expect(_ sut: LocalFeedLoader,
                         toCompletewith expectedResult: LocalFeedLoader.LoadResult,
                         when action: () -> Void,
@@ -156,33 +146,5 @@ class LoadFeedFromCacheUseCaseTests: XCTestCase {
 
         action()
         wait(for: [exp])
-    }
-
-    private func uniqueImage(id: UUID = UUID(),
-                             description: String? = "Any desc.",
-                             location: String? = "Any loc.") -> FeedImage {
-        FeedImage(id: UUID(),
-                  description: description,
-                  location: location,
-                  url: anyURL())
-    }
-
-    private func uniqueImageFeed() -> (models: [FeedImage], local: [LocalFeedImage]) {
-        let items = [uniqueImage(), uniqueImage()]
-        let localItems = items.map { LocalFeedImage(id: $0.id,
-                                                    description: $0.description,
-                                                    location: $0.location,
-                                                    url: $0.url) }
-        return (items, localItems)
-    }
-}
-
-private extension Date {
-    func adding(days: Int) -> Date {
-        Calendar(identifier: .gregorian).date(byAdding: .day, value: days, to: self)!
-    }
-
-    func adding(seconds: TimeInterval) -> Date {
-        self + seconds
     }
 }

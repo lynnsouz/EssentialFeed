@@ -4,20 +4,20 @@ import EssentialFeed
 final class CachefeedUseCaseTests: XCTestCase {
 
     func test_init_doesNotMessageStoreUponCreation() {
-        let (_, store) = makeSUT()
+        let (_, store) = makeCachefeedSUT()
 
         XCTAssertEqual(store.receivedMessages, [])
     }
 
     func test_save_requestsCacheDeletion() {
-        let (sut, store) = makeSUT()
+        let (sut, store) = makeCachefeedSUT()
         sut.save(uniqueImageFeed().models) { _ in }
 
         XCTAssertEqual(store.receivedMessages, [.deleteCachedFeed])
     }
 
     func test_save_doesNotRequestCacheInsertionOnDeletionError() {
-        let (sut, store) = makeSUT()
+        let (sut, store) = makeCachefeedSUT()
         let deletionError = anyNSError()
 
         sut.save(uniqueImageFeed().models) { _ in }
@@ -28,7 +28,7 @@ final class CachefeedUseCaseTests: XCTestCase {
 
     func test_save_requestsNewCacheInsertion0nSuccessfulDeletion() {
         let timestamp = Date()
-        let (sut, store) = makeSUT(currentDate: { timestamp })
+        let (sut, store) = makeCachefeedSUT(currentDate: { timestamp })
         let feed = uniqueImageFeed()
 
         sut.save(feed.models) { _ in }
@@ -39,7 +39,7 @@ final class CachefeedUseCaseTests: XCTestCase {
 
     func test_save_failsOnDeletionError() {
         let timestamp = Date()
-        let (sut, store) = makeSUT(currentDate: { timestamp })
+        let (sut, store) = makeCachefeedSUT(currentDate: { timestamp })
         let deletionError = anyNSError()
 
         expect(sut, toCompletewithError: deletionError) {
@@ -49,7 +49,7 @@ final class CachefeedUseCaseTests: XCTestCase {
 
     func test_save_failsOnInsertionError () {
         let timestamp = Date()
-        let (sut, store) = makeSUT(currentDate: { timestamp })
+        let (sut, store) = makeCachefeedSUT(currentDate: { timestamp })
         let insertionError = anyNSError()
 
         expect(sut, toCompletewithError: insertionError) {
@@ -60,7 +60,7 @@ final class CachefeedUseCaseTests: XCTestCase {
 
     func test_save_succeedsOnSuccessfulCacheInsertion() {
         let timestamp = Date()
-        let (sut, store) = makeSUT(currentDate: { timestamp })
+        let (sut, store) = makeCachefeedSUT(currentDate: { timestamp })
 
         expect(sut, toCompletewithError: nil) {
             store.completeDeletionSuccessfully()
@@ -112,17 +112,6 @@ final class CachefeedUseCaseTests: XCTestCase {
         action()
         wait(for: [exp])
         XCTAssertEqual(receivedError as NSError?, expectedError, file: file, line: line)
-    }
-
-
-    private func makeSUT(currentDate: @escaping () -> Date = Date.init,
-                         file: StaticString = #file,
-                         line: UInt = #line) -> (sut: LocalFeedLoader, store: FeedStoreSpy) {
-        let store = FeedStoreSpy()
-        let sut = LocalFeedLoader(store: store, currentDate: currentDate)
-        trackForMemoryLeaks(store, file: file, line: line)
-        trackForMemoryLeaks(sut, file: file, line: line)
-        return (sut, store)
     }
 
     private func uniqueImage(id: UUID = UUID(),
