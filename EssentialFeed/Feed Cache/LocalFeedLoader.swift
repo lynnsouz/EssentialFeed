@@ -43,7 +43,7 @@ extension LocalFeedLoader: FeedLoader {
     public typealias LoadResult = LoadFeedResult
 
     public func load(completion: @escaping (LoadResult) -> Void) {
-        store.retrive { [weak self] result in
+        store.retrieve { [weak self] result in
             self?.handleRetrieveResult(result, completion: completion)
         }
     }
@@ -62,7 +62,7 @@ extension LocalFeedLoader: FeedLoader {
 
 extension LocalFeedLoader {
     public func validateCache() {
-        store.retrive { [weak self] result in
+        store.retrieve { [weak self] result in
             self?.handleValidateCacheRetrieveResult(result)
         }
     }
