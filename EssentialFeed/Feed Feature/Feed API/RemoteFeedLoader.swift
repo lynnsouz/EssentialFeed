@@ -22,10 +22,10 @@ public final class RemoteFeedLoader: FeedLoader {
         }
     }
 
-    private func handleLoadResult(_ result: HTTPCLientResult,
+    private func handleLoadResult(_ result: HTTPClient.Result,
                                   completion: @escaping (Result) -> Void) {
         switch result {
-        case let .success(data, response):
+        case let .success((data, response)):
             completion(RemoteFeedLoader.map(data, from: response))
         case .failure:
             completion(.failure(RemoteFeedLoader.Error.connectivity))
