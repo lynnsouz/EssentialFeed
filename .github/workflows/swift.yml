@@ -8,7 +8,8 @@ jobs:
     runs-on: macos-13
     strategy:
         matrix:
-          destination: ['platform=macOS,arch=arm64']
+          destination: ['platform=macOS']
+          testDestination: ['platform=macOS,arch=arm64']
     steps:
       - name: Checkout
         uses: actions/checkout@master
@@ -19,6 +20,6 @@ jobs:
          destination: ${{ matrix.destination }}
       - name: Test
         run: |
-          xcodebuild clean test -project EssentialFeed.xcodeproj -scheme EssentialFeed -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+          xcodebuild clean test -project EssentialFeed.xcodeproj -scheme EssentialFeed -destination "${testDestination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
         env:
          destination: ${{ matrix.destination }}
