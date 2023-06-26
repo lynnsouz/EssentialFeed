@@ -9,7 +9,7 @@ jobs:
     strategy:
         matrix:
           destination: ['platform=macOS']
-          testDestination: ['platform=macOS,arch=arm64']
+          testDestination: ['platform=macOS,arch=x86_64']
     steps:
       - name: Checkout
         uses: actions/checkout@master
