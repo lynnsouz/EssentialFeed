@@ -5,7 +5,7 @@ on: [push]
 jobs:
   test:
     name: Test
-    runs-on: macos-13
+    runs-on: macos-13-x1
     strategy:
         matrix:
           destination: ['platform=macOS']
