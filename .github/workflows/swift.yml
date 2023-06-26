@@ -8,7 +8,7 @@ jobs:
     runs-on: macos-latest
     strategy:
         matrix:
-          destination: ['platform:macOS, name:Any Mac']
+          destination: ['platform:macOS, arch:x86_64, id:4203018E-580F-C1B5-9525-B745CECA79EB']
     steps:
       - name: Checkout
         uses: actions/checkout@master
