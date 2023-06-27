@@ -3,6 +3,16 @@ import EssentialFeed
 
 class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
 
+    override func setUp() {
+        super.setUp()
+        deleteCacheStorage()
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        deleteCacheStorage()
+    }
+
     func test_retrieve_deliversEmptyOnEmptyCache() {
         let sut = makeSUT()
 
@@ -79,9 +89,16 @@ class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
 
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> FeedStore {
         let storeBundle = Bundle(for: CoreDataFeedStore.self)
-        let storeURL = URL(fileURLWithPath: "/dev/null")
         let sut = try! CoreDataFeedStore(storeURL: storeURL, bundle: storeBundle)
         trackForMemoryLeaks(sut, file: file, line: line)
         return sut
+    }
+
+    private var storeURL: URL {
+        URL(fileURLWithPath: "/dev/null")
+    }
+
+    private func deleteCacheStorage() {
+        try? FileManager.default.removeItem(at: storeURL)
     }
 }
