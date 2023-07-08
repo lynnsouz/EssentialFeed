@@ -1,8 +1,8 @@
 import Foundation
 
-internal struct RemoteFeedImage: Decodable {
-    internal let id: UUID
-    internal let description: String?
-    internal let location: String?
-    internal let image: URL
+struct RemoteFeedImage: Decodable {
+    let id: UUID
+    let description: String?
+    let location: String?
+    let image: URL
 }
