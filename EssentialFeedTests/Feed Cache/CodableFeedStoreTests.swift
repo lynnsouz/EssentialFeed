@@ -157,7 +157,7 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
     }
 
     private func expect(_ sut: FeedStore,
-                        toRetrieveTwice expectedResult: RetrieveCachedFeedResult,
+                        toRetrieveTwice expectedResult: FeedStore.RetrievalResult,
                         file: StaticString = #file,
                         line: UInt = #line) {
         expect(sut, toRetrieve: expectedResult, file: file, line: line)
@@ -165,17 +165,17 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
     }
 
     private func expect(_ sut: FeedStore,
-                        toRetrieve expectedResult: RetrieveCachedFeedResult,
+                        toRetrieve expectedResult: FeedStore.RetrievalResult,
                         file: StaticString = #file,
                         line: UInt = #line) {
         let exp = expectation(description: "Wait for cache retrieval")
 
         sut.retrieve { retrievedResult in
             switch (expectedResult, retrievedResult) {
-            case (.empty, .empty), (.failure, .failure):
+            case (.success(.empty), .success(.empty)), (.failure, .failure):
                 break
-            case let (.found(expectedFeed, expectedTimestamp),
-                      .found(retrievedFeed, retrievedTimestamp)):
+            case let (.success(.found(expectedFeed, expectedTimestamp)),
+                      .success(.found(retrievedFeed, retrievedTimestamp))):
                 XCTAssertEqual (retrievedFeed,
                                 expectedFeed,
                                 file: file,
