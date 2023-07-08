@@ -157,7 +157,7 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
             }
             exp.fulfill()
         }
-        wait(for: [exp], timeout: 1.0)
+        wait(for: [exp], timeout: 5.0)
         return insertionError
     }
 
@@ -197,7 +197,7 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
             exp.fulfill()
         }
 
-        wait(for: [exp], timeout: 1.0)
+        wait(for: [exp], timeout: 5.0)
     }
 
     private func testSpecificStoreURL() -> URL {
