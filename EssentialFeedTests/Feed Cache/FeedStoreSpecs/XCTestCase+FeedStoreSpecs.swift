@@ -65,10 +65,18 @@ extension FeedStoreSpecs where Self: XCTestCase {
                line: line)
     }
 
-    func assertThatDeleteDeliversNoErrorOnEmptyCache(on sut: FeedStore, file: StaticString = #file, line: UInt = #line) {
-        let deletionError = deleteCache(from: sut)
+    func assertThatDeleteDeliversNoErrorOnEmptyCache(on sut: FeedStore,
+                                                     file: StaticString = #file,
+                                                     line: UInt = #line) {
+        let deletionResult = deleteCache(from: sut)
 
-        XCTAssertNil(deletionError, "Expected empty cache deletion to succeed", file: file, line: line)
+        switch deletionResult {
+        case let .failure(error):
+            XCTFail("Expected non-empty cache deletion to succeed, got \(error.localizedDescription).",
+                    file: file,
+                    line: line)
+        default: break
+        }
     }
 
     func assertThatDeleteHasNoSideEffectsOnEmptyCache(on sut: FeedStore, file: StaticString = #file, line: UInt = #line) {
@@ -80,9 +88,16 @@ extension FeedStoreSpecs where Self: XCTestCase {
     func assertThatDeleteDeliversNoErrorOnNonEmptyCache(on sut: FeedStore, file: StaticString = #file, line: UInt = #line) {
         insert((uniqueImageFeed().local, Date()), to: sut)
 
-        let deletionError = deleteCache(from: sut)
+        let deletionResult = deleteCache(from: sut)
 
-        XCTAssertNil(deletionError, "Expected non-empty cache deletion to succeed", file: file, line: line)
+        switch deletionResult {
+        case let .failure(error):
+            XCTFail("Expected non-empty cache deletion to succeed, got \(error).",
+                    file: file,
+                    line: line)
+        default: break
+        }
+
     }
 
     func assertThatDeleteEmptiesPreviouslyInsertedCache(on sut: FeedStore, file: StaticString = #file, line: UInt = #line) {
@@ -125,8 +140,13 @@ extension FeedStoreSpecs where Self: XCTestCase {
     func insert(_ cache: (feed: [LocalFeedImage], timestamp: Date), to sut: FeedStore) -> Error? {
         let exp = expectation(description: "Wait for cache insertion")
         var insertionError: Error?
-        sut.insert(cache.feed, timestamp: cache.timestamp) { receivedInsertionError in
-            insertionError = receivedInsertionError
+        sut.insert(cache.feed, timestamp: cache.timestamp) { result in
+            switch result {
+            case let .failure(error):
+                insertionError = error
+            default:
+                insertionError = nil
+            }
             exp.fulfill()
         }
         wait(for: [exp], timeout: 1.0)
@@ -134,15 +154,15 @@ extension FeedStoreSpecs where Self: XCTestCase {
     }
 
     @discardableResult
-    func deleteCache(from sut: FeedStore) -> Error? {
+    func deleteCache(from sut: FeedStore) -> Result<Void, Error>? {
         let exp = expectation(description: "Wait for cache deletion")
-        var deletionError: Error?
-        sut.deleteCachedFeed { receivedDeletionError in
-            deletionError = receivedDeletionError
+        var deletionResult: Result<Void, Error>?
+        sut.deleteCachedFeed { result in
+            deletionResult = result
             exp.fulfill()
         }
         wait(for: [exp], timeout: 1.0)
-        return deletionError
+        return deletionResult
     }
 
     func expect(_ sut: FeedStore,
