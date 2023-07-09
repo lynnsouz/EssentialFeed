@@ -1,10 +1,11 @@
 import XCTest
 import UIKit
+import EssentialFeed
 
 final class FeedViewController: UIViewController {
-    private var loader: FeedViewControllerTests.LoaderSpy?
+    private var loader: FeedLoader?
 
-    convenience init(loader: FeedViewControllerTests.LoaderSpy) {
+    convenience init(loader: FeedLoader) {
         self.init()
         self.loader = loader
     }
@@ -12,20 +13,20 @@ final class FeedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        loader?.load()
+        loader?.load { _ in }
     }
 }
 
 
 final class FeedViewControllerTests: XCTestCase {
-    
+
     func test_init_doesNotLoadFeed () {
         let loader = LoaderSpy()
         _ = FeedViewController(loader: loader)
-        
+
         XCTAssertEqual(loader.loadCallCount, 0)
     }
-    
+
     func test_viewDidLoad_loadsFeed () {
         let loader = LoaderSpy()
         let sut = FeedViewController (loader: loader)
@@ -36,9 +37,10 @@ final class FeedViewControllerTests: XCTestCase {
     }
 
     // MARK: - Helpers
-    class LoaderSpy {
+    class LoaderSpy: FeedLoader {
+
         private(set) var loadCallCount: Int = 0
-        func load() {
+        func load(completion: @escaping (FeedLoader.Result) -> Void) {
             loadCallCount += 1
         }
     }
