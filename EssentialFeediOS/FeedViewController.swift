@@ -27,13 +27,12 @@ final public class FeedViewController: UITableViewController {
     }
 
     private func handleLoadResult(_ result: FeedLoader.Result) {
-        switch result {
-        case let .success(feed):
+        if let feed = try? result.get() {
             self.tableModel = feed
             self.tableView.reloadData()
-            self.refreshControl?.endRefreshing()
-        default: break
         }
+
+        self.refreshControl?.endRefreshing()
     }
 
     public override func tableView(_ tableView: UITableView,
