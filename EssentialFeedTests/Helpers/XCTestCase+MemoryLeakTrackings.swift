@@ -6,7 +6,9 @@ extension XCTestCase {
                              file: StaticString = #file,
                              line: UInt = #line) {
         addTeardownBlock { [weak instance] in
-            XCTAssertNil(instance, "Should dealocate. Potentoal memory leak.", file: file, line: line)
+            XCTAssertNil(instance, "Should dealocate. Potentoal memory leak.",
+                         file: file,
+                         line: line)
         }
     }
 }
