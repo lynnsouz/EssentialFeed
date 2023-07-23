@@ -6,8 +6,10 @@ public final class FeedUIComposer {
 
     public static func feedComposedWith(feedLoader: FeedLoader,
                                         imageLoader: FeedImageDataLoader) -> FeedViewController {
-        let presenter = FeedPresenter(feedLoader: feedLoader)
-        let refreshController = FeedRefreshViewController(loadFeed: presenter.loadFeed)
+        let presenter = FeedPresenter()
+        let presentationAdapter = FeedLoaderPresentationAdapter(feedloader: feedLoader,
+                                                                presenter: presenter)
+        let refreshController = FeedRefreshViewController(loadFeed: presentationAdapter.loadFeed)
         let feedController = FeedViewController(refreshController: refreshController)
         presenter.loadingView = WeakRefVirtualProxy(object: refreshController)
         presenter.feedView = FeedViewAdapter(controller: feedController,
@@ -55,6 +57,33 @@ private final class FeedViewAdapter: FeedView {
             FeedImageCellController(viewModel: FeedImageViewModel(model: model,
                                                                   imageLoader: imageLoader,
                                                                   imageTransformer: UIImage.init))
+        }
+    }
+}
+
+private final class FeedLoaderPresentationAdapter {
+    private let feedLoader: FeedLoader
+    private let presenter: FeedPresenter
+
+    init(feedloader: FeedLoader, presenter: FeedPresenter) {
+        self.feedLoader = feedloader
+        self.presenter = presenter
+    }
+
+
+    func loadFeed() {
+        presenter.didStartLoadingFeed()
+        feedLoader.load { [weak self] result in
+            self?.handleLoadedResult(result)
+        }
+    }
+
+    private func handleLoadedResult(_ result: Result<[FeedImage], Error>) {
+        switch result {
+        case let .success(feed):
+            presenter.didFinishLoadingFeed (with: feed)
+        case let .failure(error):
+            presenter.didFinishLoadingFeed(with: error)
         }
     }
 }
