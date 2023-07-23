@@ -21,15 +21,15 @@ final class FeedImageCellController {
         cell.feedImageContainer.startShimmering()
 
         cell.onRetry = { [weak self, weak cell] in
-            guard let self = self,
-                  let cell = cell else { return }
+            guard let self = self else { return }
 
             self.task = imageLoader.loadImageData(from: model.url) { [weak cell] result in
+                guard let cell = cell else { return }
                 let data = try? result.get()
                 let image = data.map(UIImage.init) ?? nil
-                cell?.feedImageView.image = image
-                cell?.feedImageRetryButton.isHidden = (image != nil)
-                cell?.feedImageContainer.stopShimmering()
+                cell.feedImageView.image = image
+                cell.feedImageRetryButton.isHidden = (image != nil)
+                cell.feedImageContainer.stopShimmering()
             }
         }
 
@@ -41,7 +41,7 @@ final class FeedImageCellController {
         task = imageLoader.loadImageData(from: model.url) {_ in }
     }
 
-    deinit {
+    func cancelLoad() {
         task?.cancel()
     }
 }
