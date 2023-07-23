@@ -8,7 +8,7 @@ final class FeedRefreshViewController: NSObject, FeedLoadingView {
     init(presenter: FeedPresenter) {
         self.presenter = presenter
     }
-    
+
     @objc func refresh() {
         presenter.loadFeed()
     }
@@ -19,8 +19,8 @@ final class FeedRefreshViewController: NSObject, FeedLoadingView {
         return view
     }
 
-    func display(isLoading: Bool) {
-        handleLoadChange(isLoading)
+    func display(_ viewModel: FeedLoadingViewModel) {
+        handleLoadChange(viewModel.isLoading)
     }
 
     private func handleLoadChange(_ isLoading: Bool) {
