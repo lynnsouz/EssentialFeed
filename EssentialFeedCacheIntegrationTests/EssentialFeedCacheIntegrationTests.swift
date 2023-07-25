@@ -19,9 +19,9 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
         let exp = expectation(description: "Wait for load completion")
         sut.load { result in
             switch result {
-            case let . success(imageFeed):
+            case let .success(imageFeed):
                 XCTAssertEqual(imageFeed, [], "Expected empty feed")
-            case let . failure(error):
+            case let .failure(error):
                 XCTFail("Expected successful feed result, got \(error) instead")
             }
             exp.fulfill()
@@ -62,7 +62,7 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
     private func makeSUT(file: StaticString = #file,
                          line: UInt = #line) -> LocalFeedLoader {
         let storeBundle = Bundle(for: CoreDataFeedStore.self)
-        let storeURL = testSpecificStoreURL ()
+        let storeURL = testSpecificStoreURL()
         let store = try! CoreDataFeedStore(storeURL: storeURL, bundle: storeBundle)
         let sut = LocalFeedLoader(store: store, currentDate: Date.init)
         trackForMemoryLeaks (store, file: file, line: line)
@@ -108,7 +108,7 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
     }
 
     private func testSpecificStoreURL() -> URL {
-        cachesDirectory().appendingPathComponent ("\(type(of: self)).store")
+        cachesDirectory().appendingPathComponent("\(type(of: self)).store")
     }
 
     private func cachesDirectory() -> URL {
