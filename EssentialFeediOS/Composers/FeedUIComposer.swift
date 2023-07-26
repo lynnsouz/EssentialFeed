@@ -11,6 +11,7 @@ public final class FeedUIComposer {
         let bundle = Bundle(for: FeedViewController.self)
         let storybard = UIStoryboard(name: "Feed", bundle: bundle)
         let feedController = storybard.instantiateInitialViewController() as! FeedViewController
+        feedController.title = FeedPresenter.title
 
         feedController.delegate = presentationAdapter
 
