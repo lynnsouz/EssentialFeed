@@ -10,14 +10,8 @@ final class FeedViewControllerTests: XCTestCase {
         let (sut, _) = makeSUT()
         sut.loadViewIfNeeded()
 
-        let bundle = Bundle(for: FeedViewController.self)
-        let localizedKey = "FEED_VIEW_TITLE"
-        let localizedTitle = bundle.localizedString(forKey: localizedKey,
-                                                    value: nil,
-                                                    table: "Feed")
+        let localizedTitle = localized("FEED_VIEW_TITLE")
 
-        XCTAssertNotEqual(localizedKey, localizedTitle,
-                          "Missing localized string for key")
         XCTAssertEqual(sut.title, localizedTitle)
     }
 
@@ -360,6 +354,22 @@ final class FeedViewControllerTests: XCTestCase {
                        "Expected description text to be \(String(describing: image.description)) for image view at index (\(index)",
                        file: file,
                        line: line)
+    }
+
+    private func localized(_ key: String,
+                           table: String? = "Feed",
+                           file: StaticString = #file,
+                           line: UInt = #line) -> String {
+        let bundle = Bundle(for: FeedViewController.self)
+        let value = bundle.localizedString(forKey: key,
+                                           value: nil,
+                                           table: table)
+        if value == key {
+            XCTFail("Missing localized string for key: \(key) in table: \(String(describing: table))",
+                    file: file,
+                    line: line)
+        }
+        return value
     }
 
     private func makeImage(description: String? = nil,
