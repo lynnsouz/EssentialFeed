@@ -705,6 +705,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"pt-BR",
 			);
 			mainGroup = 3CD1B14129D50FC6000DBDDC;
 			productRefGroup = 3CD1B14C29D50FC6000DBDDC /* Products */;
