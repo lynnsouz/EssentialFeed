@@ -1,10 +1,11 @@
-import Foundation
 import XCTest
 import EssentialFeed
 
-final class URLSessionHTTPClientTests: XCTestCase {
+class URLSessionHTTPClientTests: XCTestCase {
+
     override func tearDown() {
         super.tearDown()
+
         URLProtocolStub.removeStub()
     }
 
@@ -38,7 +39,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
 
         let receivedError = resultErrorFor((data: nil, response: nil, error: requestError))
 
-        XCTAssertNotNil(receivedError)
+        XCTAssertEqual(receivedError?.localizedDescription, requestError.localizedDescription)
     }
 
     func test_getFromURL_failsOnAllInvalidRepresentationCases() {
@@ -77,7 +78,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> HTTPClient {
+    private func makeSUT(file: StaticString = #file, line: UInt = #line) -> HTTPClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLProtocolStub.self]
         let session = URLSession(configuration: configuration)
@@ -87,19 +88,15 @@ final class URLSessionHTTPClientTests: XCTestCase {
         return sut
     }
 
-    private func resultValuesFor(_ values: (data: Data?,
-                                            response: URLResponse?,
-                                            error: Error?),
-                                 file: StaticString = #filePath,
-                                 line: UInt = #line) -> (data: Data, response: HTTPURLResponse)? {
+    private func resultValuesFor(_ values: (data: Data?, response: URLResponse?, error: Error?), file: StaticString = #file, line: UInt = #line) -> (data: Data, response: HTTPURLResponse)? {
         let result = resultFor(values, file: file, line: line)
 
         switch result {
-        case let .success(values):
-            return values
-        default:
-            XCTFail("Expected success, got \(result) instead", file: file, line: line)
-            return nil
+            case let .success((data, response)):
+                return (data, response)
+            default:
+                XCTFail("Expected success, got \(result) instead", file: file, line: line)
+                return nil
         }
     }
 
@@ -141,22 +138,11 @@ final class URLSessionHTTPClientTests: XCTestCase {
         return receivedResult
     }
 
-    private func nonHTTPURLResponse() -> URLResponse {
-        URLResponse(url: anyURL(),
-                    mimeType: nil,
-                    expectedContentLength: 0,
-                    textEncodingName: nil)
-    }
     private func anyHTTPURLResponse() -> HTTPURLResponse {
-        HTTPURLResponse(url: anyURL(),
-                        statusCode: 200,
-                        httpVersion: nil,
-                        headerFields: nil)!
+        return HTTPURLResponse(url: anyURL(), statusCode: 200, httpVersion: nil, headerFields: nil)!
     }
-    private func anyData() -> Data {
-        Data("anv data".utf8)
-    }
-    private func anyError() -> NSError {
-        NSError(domain: "any error", code: 0)
+
+    private func nonHTTPURLResponse() -> URLResponse {
+        return URLResponse(url: anyURL(), mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
     }
 }

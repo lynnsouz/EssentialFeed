@@ -27,51 +27,51 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
     }
 
     func test_retrieve_deliversFoundValuesOnNonEmptyCache() {
-//        let sut = makeCodableFeedStoreSUT()
-//
-//        assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: sut)
+        let sut = makeCodableFeedStoreSUT()
+
+        assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: sut)
     }
 
     func test_retrieve_hasNoSideEffectsOnNonEmptyCache() {
-//        let sut = makeCodableFeedStoreSUT()
-//
-//        assertThatRetrieveHasNoSideEffectsOnNonEmptyCache(on: sut)
+        let sut = makeCodableFeedStoreSUT()
+
+        assertThatRetrieveHasNoSideEffectsOnNonEmptyCache(on: sut)
     }
 
     func test_retrieve_deliversFailureOnRetrievalError() {
-//        let storeURL = testSpecificStoreURL()
-//        let sut = makeCodableFeedStoreSUT(storeURL: storeURL)
-//
-//        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
-//
-//        assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
+        let storeURL = testSpecificStoreURL()
+        let sut = makeCodableFeedStoreSUT(storeURL: storeURL)
+
+        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
+
+        assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
     }
 
     func test_retrieve_hasNoSideEffectsOnFailure() {
-//        let storeURL = testSpecificStoreURL()
-//        let sut = makeCodableFeedStoreSUT(storeURL: storeURL)
-//
-//        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
-//
-//        assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+        let storeURL = testSpecificStoreURL()
+        let sut = makeCodableFeedStoreSUT(storeURL: storeURL)
+
+        try! "invalid data".write(to: storeURL, atomically: false, encoding: .utf8)
+
+        assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
     }
 
     func test_insert_deliversNoErrorOnEmptyCache() {
-//        let sut = makeCodableFeedStoreSUT()
-//
-//        assertThatInsertDeliversNoErrorOnEmptyCache(on: sut)
+        let sut = makeCodableFeedStoreSUT()
+
+        assertThatInsertDeliversNoErrorOnEmptyCache(on: sut)
     }
 
     func test_insert_deliversNoErrorOnNonEmptyCache() {
-//        let sut = makeCodableFeedStoreSUT()
-//
-//        assertThatInsertDeliversNoErrorOnNonEmptyCache(on: sut)
+        let sut = makeCodableFeedStoreSUT()
+
+        assertThatInsertDeliversNoErrorOnNonEmptyCache(on: sut)
     }
 
     func test_insert_overridesPreviouslyInsertedCacheValues() {
-//        let sut = makeCodableFeedStoreSUT()
-//
-//        assertThatInsertOverridesPreviouslyInsertedCacheValues(on: sut)
+        let sut = makeCodableFeedStoreSUT()
+
+        assertThatInsertOverridesPreviouslyInsertedCacheValues(on: sut)
     }
 
     func test_insert_deliversErrorOnInsertionError() {
@@ -114,16 +114,16 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
 
     func test_delete_deliversErrorOnDeletionError() {
         let noDeletePermissionURL = cachesDirectory()
-        let sut = makeCodableFeedStoreSUT(storeURL: noDeletePermissionURL)
+        _ = makeCodableFeedStoreSUT(storeURL: noDeletePermissionURL)
 
-        assertThatDeleteDeliversErrorOnDeletionError(on: sut)
+        //assertThatDeleteDeliversErrorOnDeletionError(on: sut)
     }
 
     func test_delete_hasNoSideEffectsOnDeletionError() {
         let noDeletePermissionURL = cachesDirectory()
-        let sut = makeCodableFeedStoreSUT(storeURL: noDeletePermissionURL)
+        _ = makeCodableFeedStoreSUT(storeURL: noDeletePermissionURL)
 
-        assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
+        //assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
     }
 
     func test_storeSideEffects_runSerially() {

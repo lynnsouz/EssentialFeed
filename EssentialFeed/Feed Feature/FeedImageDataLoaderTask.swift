@@ -1,5 +1,4 @@
 import Foundation
-import EssentialFeed
 
 public protocol FeedImageDataLoaderTask {
     func cancel()
