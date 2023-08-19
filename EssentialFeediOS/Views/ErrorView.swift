@@ -2,6 +2,8 @@ import UIKit
 
 public final class ErrorView: UIView {
     @IBOutlet private var label: UILabel!
+    @IBOutlet public var button: UIButton!
+
     
     public var message: String? {
         get { return isVisible ? label.text : nil }

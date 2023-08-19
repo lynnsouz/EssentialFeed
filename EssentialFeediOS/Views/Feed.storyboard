@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="nXa-SG-w8P">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -27,7 +28,7 @@
                                         <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </state>
                                     <connections>
-                                        <action selector="hideMessage" destination="M7N-Ps-FmU" eventType="touchUpInside" id="pyJ-ks-yGi"/>
+                                        <action selector="button:" destination="KB4-vp-KCB" eventType="touchUpInside" id="zti-5K-idT"/>
                                         <action selector="hideMessageAnimated" destination="M7N-Ps-FmU" eventType="touchUpInside" id="vhP-CU-gYd"/>
                                     </connections>
                                 </button>
@@ -51,7 +52,7 @@
                                 <constraint firstAttribute="trailing" secondItem="xKh-ee-qYm" secondAttribute="trailing" id="qbQ-gx-Mgb"/>
                             </constraints>
                             <connections>
-                                <outlet property="button" destination="xKh-ee-qYm" id="UH6-JX-of9"/>
+                                <outlet property="button" destination="xKh-ee-qYm" id="3Bp-uq-9OR"/>
                                 <outlet property="label" destination="VgX-aF-XsW" id="bkx-Eq-Fzi"/>
                             </connections>
                         </view>
@@ -185,6 +186,7 @@
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ugg-Wr-GM4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="KB4-vp-KCB" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="872.51908396946567" y="-39.436619718309863"/>
         </scene>
