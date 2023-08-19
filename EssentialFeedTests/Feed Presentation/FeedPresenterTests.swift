@@ -88,5 +88,4 @@ class FeedPresenterTests: XCTestCase {
             messages.insert(.display(feed: viewModel.feed))
         }
     }
-
 }

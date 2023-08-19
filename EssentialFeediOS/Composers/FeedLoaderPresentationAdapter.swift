@@ -1,4 +1,3 @@
-import Foundation
 import EssentialFeed
 
 final class FeedLoaderPresentationAdapter: FeedViewControllerDelegate {
